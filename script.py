@@ -9,12 +9,6 @@ from subprocess import Popen
 from pythonping import ping
 
 devnull = open(os.devnull, 'wb')
-
-p = []
-active = []
-not_responding = 0
-failed = 0
-
 chat_ids = []
 
 def handle(msg):
@@ -28,10 +22,35 @@ def handle(msg):
 
     if command == 'start':
         chat_ids.append(chat_id)
-        bot.sendMessage(chat_id, 'You will now receive notification if you are lagging')
+        bot.sendMessage(chat_id, 'You will now receive a notification if you are lagging')
 
+    elif command == 'scan':
+        active = []
+        p = []
+        bot.sendMessage(chat_id, 'Scanning started...')
+        start = time.time()
+        for ping in range(1,255):
+            address = '192.168.1.' + str(ping)
+            p.append((address, Popen(['ping', '-c', '3', address], stdout=devnull)))
 
-TOKEN = sys.argv[1]  # get token from command-line
+        while p:
+            for i, (address, proc) in enumerate(p[:]):
+                if proc.poll() is not None:
+                    p.remove((address, proc))
+                    if proc.returncode == 0:
+                        print( 'ping to', address, 'OK')
+                        active.append(address)
+                    elif proc.returncode == 2:
+                        print("no response from", address)
+                    else:
+                        print("ping to", address, "failed!")
+        end = time.time()
+
+        for ip in active:
+            bot.sendMessage(chat_id, 'Ping to ' + str(ip) + ' successfull')
+        bot.sendMessage(chat_id, 'Scan time: ' + str(end - start) + 's')
+
+TOKEN = sys.argv[1]
 bot = telepot.Bot(TOKEN)
 MessageLoop(bot, handle).run_as_thread()
 print ('Listening ...')
@@ -43,29 +62,4 @@ while 1:
         for chat_id in chat_ids:
             bot.sendMessage(chat_id, 'Yes, you are, your ping is ' + str(response_list.rtt_avg_ms) + 'ms')
     time.sleep(10)
-
-"""start = time.time()
-
-for ping in range(1,255):
-    address = '192.168.1.' + str(ping)
-    p.append((address, Popen(['ping', '-c', '3', address], stdout=devnull)))
-
-while p:
-    for i, (address, proc) in enumerate(p[:]):
-        if proc.poll() is not None:
-            p.remove((address, proc))
-            if proc.returncode == 0:
-                print( "ping to", address, "OK")
-                active.append(address)
-            elif proc.returncode == 2:
-                #print("no response from", address)
-                not_responding += 1
-            else:
-                #print("ping to", address, "failed!")
-                failed += 1
-
-end = time.time()"""
-
 devnull.close()
-
-print("Scan time: " + str(end - start) + "s")
