@@ -21,7 +21,7 @@ def handle(msg):
     command = msg['text'][1:].lower()
 
     if command == 'start':
-        chat_ids.append(chat_id)
+        chat_ids.append(chat_id) if chat_id not in chat_ids else chat_ids
         bot.sendMessage(chat_id, 'You will now receive a notification if you are lagging')
 
     elif command == 'scan':
