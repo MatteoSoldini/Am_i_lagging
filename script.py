@@ -22,12 +22,18 @@ def handle(msg):
 
     if command == 'start':
         chat_ids.append(chat_id) if chat_id not in chat_ids else chat_ids
-        bot.sendMessage(chat_id, 'You will now receive a notification if you are lagging')
+        try:
+            bot.sendMessage(chat_id, 'You will now receive a notification if you are lagging')
+        except Exception as inst:
+            print(inst)
 
     elif command == 'scan':
         active = []
         p = []
-        bot.sendMessage(chat_id, 'Scanning started...')
+        try:
+            bot.sendMessage(chat_id, 'Scanning started...')
+        except Exception as inst:
+            print(inst)
         start = time.time()
         for ping in range(1,255):
             address = '192.168.1.' + str(ping)
@@ -57,9 +63,15 @@ print ('Listening ...')
 
 # Keep the program running.
 while 1:
-    response_list = ping('8.8.8.8', size=40, count=10)
+    try:
+        response_list = ping('8.8.8.8', size=40, count=10)
+    except Exception as inst:
+        print(inst)
     if response_list.rtt_avg_ms > 300:
         for chat_id in chat_ids:
-            bot.sendMessage(chat_id, 'Yes, you are, your ping is ' + str(response_list.rtt_avg_ms) + 'ms')
+            try:
+                bot.sendMessage(chat_id, 'Yes, you are, your ping is ' + str(response_list.rtt_avg_ms) + 'ms')
+            except Exception as inst:
+                print(inst)
     time.sleep(10)
 devnull.close()
