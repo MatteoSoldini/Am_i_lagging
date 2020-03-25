@@ -68,7 +68,7 @@ while 1:
             response_list = ping('8.8.8.8', size=40, count=10)
         except Exception as inst:
             print(inst)
-        if response_list.rtt_avg_ms > 300:
+        if response_list.rtt_avg_ms > 500:
             for chat_id in chat_ids:
                 try:
                     bot.sendMessage(chat_id, 'Yes, you are, your ping is ' + str(response_list.rtt_avg_ms) + 'ms')
