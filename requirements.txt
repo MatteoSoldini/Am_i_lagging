@@ -1,0 +1,2 @@
+pythonping==1.0.8
+telepot==12.7
