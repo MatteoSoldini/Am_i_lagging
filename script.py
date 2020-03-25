@@ -63,6 +63,7 @@ print ('Listening ...')
 
 # Keep the program running.
 while 1:
+    response_list = []
     try:
         response_list = ping('8.8.8.8', size=40, count=10)
     except Exception as inst:
